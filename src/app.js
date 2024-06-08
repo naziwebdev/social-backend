@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const {setHeaders} = require('./middlewares/headers')
+const {errorHandler} = require('./middlewares/errorHandler')
 
 const app = express();
 

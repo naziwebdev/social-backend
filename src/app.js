@@ -1,11 +1,17 @@
 const express = require("express");
 const path = require("path");
+const {setHeaders} = require('./middlewares/headers')
 
 const app = express();
+
+/*Cors Policy*/
+app.use(setHeaders())
 
 /*Body-parser*/
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.json({ limit: "50mb" }));
+
+
 
 /*Static Folders*/
 app.use(express.static(path.join(__dirname, "..", "public")));

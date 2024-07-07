@@ -19,7 +19,7 @@ const connectToDB = async () => {
 };
 
 const sevrverRunning = () => {
-  const port = +process.env.PORT || 4002;
+  const port = +process.env.PORT || 4001;
 
   app.listen(port, () => {
     console.log(`Sever running on port ${port}`);

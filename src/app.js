@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+require('dotenv').config();
+const cookieParser = require("cookie-parser");
 const authRouter = require("./modules/auth/auth.routes");
 const { setHeaders } = require("./middlewares/headers");
 const { errorHandler } = require("./middlewares/errorHandler");
@@ -7,11 +9,14 @@ const { errorHandler } = require("./middlewares/errorHandler");
 const app = express();
 
 /*Cors Policy*/
-app.use(setHeaders());
+app.use(setHeaders);
 
 /*Body-parser*/
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.json({ limit: "50mb" }));
+
+/*Cookie Parser*/
+app.use(cookieParser());
 
 /*Static Folders*/
 app.use(express.static(path.join(__dirname, "..", "public")));

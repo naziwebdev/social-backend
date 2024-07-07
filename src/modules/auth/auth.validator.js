@@ -1,19 +1,19 @@
 const yup = require("yup");
 
 exports.registerSchemaٰValidator = yup.object({
-  username: yup
-    .required("username is required")
+  username:yup
     .string()
-    .min(3, "this field must be at least 3 chars"),
-  email: yup
-    .required("email is required")
+    .min(3, "this field must be at least 3 chars")
+    .required("username is required"),
+  email:yup
     .string()
-    .email("email format in incorrect"),
-  name: yup
-    .required("name is required")
+    .email("email format in incorrect")
+    .required("email is required"),
+  name:yup
     .string()
-    .min(3, "this field must be at least 3 chars"),
-  password: yup
+    .min(3, "this field must be at least 3 chars")
+    .required("name is required"),
+  password:yup
     .string()
     .required("password is required")
     .min(6, "this field must be at least 6 chars")

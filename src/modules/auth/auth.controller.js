@@ -1,5 +1,8 @@
 const userModel = require("../../models/User");
 const { registerSchemaٰValidator } = require("./auth.validator");
+const jwt = require("jsonwebtoken");
+const RefreshTokenModel = require("../../models/RefreshToken");
+require('dotenv').config()
 
 exports.register = async (req, res, next) => {
   try {
@@ -27,6 +30,23 @@ exports.register = async (req, res, next) => {
 
     user = new userModel({ username, email, name, password, role });
     user = await user.save();
+
+
+    const accessToken = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30day",
+    });
+
+    const refreshToken = await RefreshTokenModel.createToken(user);
+
+    res.cookie("access-token", accessToken, {
+      maxAge: 900000,
+      httpOnly: true,
+    });
+
+    res.cookie("refresh-token", refreshToken, {
+      maxAge: 900000,
+      httpOnly: true,
+    });
 
     return res.status(201).json({ message: "user registerd successfully" });
   } catch (error) {

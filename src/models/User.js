@@ -9,10 +9,10 @@ const schema = new mongoose.Schema(
       unique: true,
       lowercase: true,
     },
-    usename: {
+    username: {
       type: String,
       required: true,
-      unique: true,
+    
     },
     biogeraphy: {
       type: String,
@@ -47,7 +47,7 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-schema.pre("save", async (next) => {
+schema.pre("save",  async function (next) {
   try {
     this.password = await bcrypt.hash(this.password, 10);
     next();

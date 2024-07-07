@@ -3,8 +3,11 @@ const path = require("path");
 require('dotenv').config();
 const cookieParser = require("cookie-parser");
 const authRouter = require("./modules/auth/auth.routes");
+const postRouter = require('./modules/post/post.routes')
+
 const { setHeaders } = require("./middlewares/headers");
 const { errorHandler } = require("./middlewares/errorHandler");
+
 
 const app = express();
 
@@ -23,6 +26,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 
 /*Routes*/
 app.use("/auth", authRouter);
+app.use('/post' , postRouter)
 
 /*404 Error Handler*/
 app.use((req, res) => {

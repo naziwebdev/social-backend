@@ -4,8 +4,8 @@ const pageController = require("./page.controller");
 
 const router = express.Router();
 
-router.report("/:pageID").get(auth, pageController.getPage);
-router.post("/:pageID/follow").post(auth, pageController.follow);
-router.post("/:pageID/unfollow").post(auth, pageController.unFollow);
+router.route("/:pageID").get(auth, pageController.getPage);
+router.route("/:pageID/follow").post(auth, pageController.follow);
+router.route("/:pageID/unfollow").post(auth, pageController.unFollow);
 
 module.exports = router;

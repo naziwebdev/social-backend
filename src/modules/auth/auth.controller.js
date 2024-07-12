@@ -44,11 +44,13 @@ exports.register = async (req, res, next) => {
     res.cookie("access-token", accessToken, {
       maxAge: 900000,
       httpOnly: true,
+      sameSite: 'strict', 
     });
 
     res.cookie("refresh-token", refreshToken, {
       maxAge: 900000,
       httpOnly: true,
+      sameSite: 'strict', 
     });
 
     return res.status(201).json({ message: "user registerd successfully" });
@@ -93,11 +95,13 @@ exports.login = async (req, res, next) => {
     res.cookie("access-token", accessToken, {
       maxAge: 900000,
       hhtpOnly: true,
+      sameSite: 'strict', 
     });
 
     res.cookie("refresh-token", refreshToken, {
       maxAge: 900000,
       hhtpOnly: true,
+      sameSite: 'strict', 
     });
 
     return res.status(200).json({ message: "user login successfully" });

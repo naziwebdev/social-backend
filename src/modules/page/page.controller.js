@@ -69,6 +69,18 @@ exports.follow = async (req, res, next) => {
 
 exports.unFollow = async (req, res, next) => {
   try {
+    const user = req.user;
+    const { pageID } = req.params;
+
+    const unFollowPage = await FollowModel.findOneAndDelete({
+      follower: user._id,
+      following: pageID,
+    });
+
+    if (!unFollowPage) {
+      return res.status(404).json({ message: "you dont follow this page" });
+    }
+    return res.status(200).json({ message: "page unFollowed successfully" });
   } catch (error) {
     next(error);
   }

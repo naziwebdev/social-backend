@@ -6,7 +6,8 @@ exports.create = async (req, res, next) => {
     const user = req.user._id;
     const { description, hashtags } = req.body;
 
-    const tags = hashtags?.splite(",");
+    const tags = hashtags?.split(",");
+
 
     if (!req.file) {
       return res.status(404).json({ message: "please upload a file" });

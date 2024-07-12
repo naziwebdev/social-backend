@@ -2,7 +2,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 
-module.multerStorage = (destination, validFormat = /png|jpeg|webp|jpg/) => {
+exports.multerStorage = (destination, validFormat = /png|jpeg|webp|jpg/) => {
   if (!fs.existsSync(destination)) {
     fs.mkdirSync(destination);
   }

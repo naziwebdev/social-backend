@@ -5,7 +5,6 @@ const schema = new mongoose.Schema(
     media: {
       path: { type: String, required: true },
       filename: { type: String, required: true },
-      required: true,
     },
     user: {
       type: mongoose.Types.ObjectId,

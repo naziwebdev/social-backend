@@ -3,7 +3,6 @@ const postModel = require("../../models/Post");
 
 exports.create = async (req, res, next) => {
   try {
-
     const user = req.user._id;
     const { description, hashtags } = req.body;
 
@@ -18,12 +17,10 @@ exports.create = async (req, res, next) => {
       { abortEarly: false }
     );
 
-    
-
     const post = new postModel({
       media: {
         filename: req.file.filename,
-        path:`images/posts/${req.file.filename}`,
+        path: `images/posts/${req.file.filename}`,
       },
       user,
       description,

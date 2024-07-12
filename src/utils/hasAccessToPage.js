@@ -3,7 +3,7 @@ const userModel = require("../models/User");
 
 module.exports = async (userID, pageID) => {
   try {
-    if (userID === pageID) {
+    if (userID.toString() === pageID) {
       return true;
     }
 

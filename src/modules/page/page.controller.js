@@ -36,12 +36,32 @@ exports.getPage = async (req, res, next) => {
 
 exports.follow = async (req, res, next) => {
   try {
+    const user = req.user;
+    const { pageID } = req.params;
 
-    
+    const existPage = await UserModel.findOne({ _id: pageID });
+    if (!existPage) {
+      return res.status(404).json({ message: "not found page" });
+    }
 
+    if (user._id.toString() === pageID) {
+      return res.status(409).json({ message: "you can not follow yourself" });
+    }
 
+    const followAleary = await FollowModel.findOne({
+      follower: user._id,
+      following: pageID,
+    }).lean();
+    if (followAleary) {
+      return res.status(409).json({ message: "you follow this page already" });
+    }
 
+    await FollowModel.create({
+      follower: user._id,
+      following: pageID,
+    });
 
+    return res.status(201).json({ message: "page followed successfully" });
   } catch (error) {
     next(error);
   }

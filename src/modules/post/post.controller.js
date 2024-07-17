@@ -57,11 +57,11 @@ exports.like = async (req, res, next) => {
       return res.status(403).json({ message: "access to post is forbidden" });
     }
 
-
-    const existLike = await likeModel.findOne({user:user._id,post:postID}).lean()
-    if(existLike){
+    const existLike = await likeModel
+      .findOne({ user: user._id, post: postID })
+      .lean();
+    if (existLike) {
       return res.status(409).json({ message: "like exist already" });
-
     }
 
     const like = new likeModel({
@@ -76,8 +76,6 @@ exports.like = async (req, res, next) => {
     }
 
     return res.status(201).json({ message: "post liked successfully" });
-
-
   } catch (error) {
     next(error);
   }
@@ -85,6 +83,22 @@ exports.like = async (req, res, next) => {
 
 exports.dislike = async (req, res, next) => {
   try {
+    const { postID } = req.body;
+    const user = req.user;
+
+    if (!isValidObjectId(postID)) {
+      return res.status(409).json({ message: "postID isnot valid" });
+    }
+
+    const like = await likeModel.findOne({ user: user._id, post: postID });
+
+    if (!like) {
+      return res.status(404).json({ message: "you dont like this post" });
+    }
+
+    await likeModel.findOneAndDelete({ _id: like._id });
+
+    return res.status(200).json({ message: "deleted dislike was successfully" });
   } catch (error) {
     next(error);
   }

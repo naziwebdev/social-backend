@@ -1,6 +1,6 @@
 const yup = require("yup");
 
-exports.registerSchemaٰValidator = yup.object({
+exports.editUserValidator = yup.object({
   username: yup
     .string()
     .min(3, "this field must be at least 3 chars")
@@ -17,3 +17,6 @@ exports.registerSchemaٰValidator = yup.object({
       "رمز عبور باید حاوی حروف بزرگ و کوچک و اعداد و علائم باشد"
     ),
 });
+
+
+

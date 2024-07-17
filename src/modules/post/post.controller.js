@@ -1,5 +1,8 @@
 const { createPostValidator } = require("./post.validators");
 const postModel = require("../../models/Post");
+const { isValidObjectId } = require("mongoose");
+const hasAccessToPage = require("../../utils/hasAccessToPage");
+const likeModel = require("../../models/Like");
 
 exports.create = async (req, res, next) => {
   try {
@@ -7,7 +10,6 @@ exports.create = async (req, res, next) => {
     const { description, hashtags } = req.body;
 
     const tags = hashtags?.split(",");
-
 
     if (!req.file) {
       return res.status(404).json({ message: "please upload a file" });
@@ -31,6 +33,58 @@ exports.create = async (req, res, next) => {
     await post.save();
 
     return res.status(201).json({ message: "post upload successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.like = async (req, res, next) => {
+  try {
+    const { postID } = req.body;
+    const user = req.user;
+
+    if (!isValidObjectId(postID)) {
+      return res.status(409).json({ message: "postID isnot valid" });
+    }
+
+    const post = await postModel.findOne({ _id: postID });
+    if (!post) {
+      return res.status(409).json({ message: "postID isnot valid" });
+    }
+
+    const hasAccess = await hasAccessToPage(user._id, post.user.toString());
+    if (!hasAccess) {
+      return res.status(403).json({ message: "access to post is forbidden" });
+    }
+
+
+    const existLike = await likeModel.findOne({user:user._id,post:postID}).lean()
+    if(existLike){
+      return res.status(409).json({ message: "like exist already" });
+
+    }
+
+    const like = new likeModel({
+      user: user._id,
+      post,
+    });
+
+    like.save();
+
+    if (!like) {
+      return res.status(404).json({ message: "not found like" });
+    }
+
+    return res.status(201).json({ message: "post liked successfully" });
+
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.dislike = async (req, res, next) => {
+  try {
   } catch (error) {
     next(error);
   }

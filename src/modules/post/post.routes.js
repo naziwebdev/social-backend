@@ -11,7 +11,11 @@ const upload = multerStorage(
 
 const router = express.Router();
 
-router.route("/").post(auth, AccountVerify,upload.single('media') ,postController.create);
+router
+  .route("/")
+  .post(auth, AccountVerify, upload.single("media"), postController.create);
 
+router.route("/like").post(auth, postController.like);
+router.route("/dislike").post(auth, postController.dislike);
 
 module.exports = router;

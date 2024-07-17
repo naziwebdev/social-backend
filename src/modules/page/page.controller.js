@@ -1,6 +1,7 @@
 const hasAccessToPage = require("../../utils/hasAccessToPage");
 const UserModel = require("../../models/User");
 const FollowModel = require("../../models/Follow");
+const postModel = require("../../models/Post");
 
 exports.getPage = async (req, res, next) => {
   try {
@@ -15,7 +16,10 @@ exports.getPage = async (req, res, next) => {
       following: pageID,
     }).lean();
 
-    const page = await UserModel.findOne({ _id: pageID },"name username private isVerified").lean()
+    const page = await UserModel.findOne(
+      { _id: pageID },
+      "name username private isVerified"
+    ).lean();
 
     if (!hasAccessPage) {
       return res.status(403).json({
@@ -27,6 +31,12 @@ exports.getPage = async (req, res, next) => {
         page,
       });
     }
+
+    const post = await postModel
+      .find({ user: pageID })
+      .lean()
+      .populate("user", "name username avatar")
+      .sort({ _id: -1 });
 
     let followers = await FollowModel.find({ following: pageID })
       .lean()
@@ -40,19 +50,17 @@ exports.getPage = async (req, res, next) => {
 
     following = following.map((item) => item.following);
 
-    const ownPage = user._id.toString === pageID
+    const ownPage = user._id.toString === pageID;
 
-    return res
-      .status(200)
-      .json({
-        haveFollowed: Boolean(followed),
-        hasAccessPage,
-        followers,
-        following,
-        pageID,
-        page,
-        ownPage
-      });
+    return res.status(200).json({
+      haveFollowed: Boolean(followed),
+      hasAccessPage,
+      followers,
+      following,
+      pageID,
+      page,
+      ownPage,
+    });
   } catch (error) {
     next(error);
   }

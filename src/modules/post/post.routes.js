@@ -13,4 +13,5 @@ const router = express.Router();
 
 router.route("/").post(auth, AccountVerify,upload.single('media') ,postController.create);
 
+
 module.exports = router;

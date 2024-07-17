@@ -42,13 +42,13 @@ exports.register = async (req, res, next) => {
     const refreshToken = await RefreshTokenModel.createToken(user);
 
     res.cookie("access-token", accessToken, {
-      maxAge: 900000,
+      maxAge: 90000000,
       httpOnly: true,
       sameSite: 'strict', 
     });
 
     res.cookie("refresh-token", refreshToken, {
-      maxAge: 900000,
+      maxAge: 90000000,
       httpOnly: true,
       sameSite: 'strict', 
     });
@@ -93,14 +93,14 @@ exports.login = async (req, res, next) => {
     const refreshToken = await RefreshTokenModel.createToken(user);
 
     res.cookie("access-token", accessToken, {
-      maxAge: 900000,
-      hhtpOnly: true,
+      maxAge: 9000000,
+      httpOnly: true,
       sameSite: 'strict', 
     });
 
     res.cookie("refresh-token", refreshToken, {
-      maxAge: 900000,
-      hhtpOnly: true,
+      maxAge: 9000000,
+      httpOnly: true,
       sameSite: 'strict', 
     });
 

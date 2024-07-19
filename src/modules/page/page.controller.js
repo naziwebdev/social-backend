@@ -19,7 +19,7 @@ exports.getPage = async (req, res, next) => {
 
     const page = await UserModel.findOne(
       { _id: pageID },
-      "name username private isVerified"
+      "name username private isVerified avatar"
     ).lean();
 
     if (!hasAccessPage) {
@@ -51,9 +51,9 @@ exports.getPage = async (req, res, next) => {
       if (likes.length) {
         likes.forEach((like) => {
           if (post._id.toString() === like.post._id.toString()) {
-            postsWithLikes.push({ ...post, hasLike: true });
-          } else {
-            postsWithLikes.push({ ...post });
+            postsWithLikes.push({...post, hasLike: true });
+          }else{
+            postsWithLikes.push({...post, hasLike: false });
           }
         });
       } else {
@@ -73,7 +73,7 @@ exports.getPage = async (req, res, next) => {
 
     following = following.map((item) => item.following);
 
-    const ownPage = user._id.toString === pageID;
+    const ownPage = user._id.toString() === pageID;
 
     return res.status(200).json({
       haveFollowed: Boolean(followed),

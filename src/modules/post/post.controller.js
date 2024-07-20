@@ -38,6 +38,19 @@ exports.create = async (req, res, next) => {
   }
 };
 
+
+exports.getAll = async (req,res,next) => {
+  try {
+
+    const posts = await postModel.find({}).lean().sort({_id:-1})
+
+    return res.status(200).json(posts)
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
 exports.like = async (req, res, next) => {
   try {
     const { postID } = req.body;
@@ -45,9 +58,9 @@ exports.like = async (req, res, next) => {
 
     console.log(postID)
 
-    // if (!isValidObjectId(postID)) {
-    //   return res.status(409).json({ message: "postID isnot valid" });
-    // }
+    if (!isValidObjectId(postID)) {
+      return res.status(409).json({ message: "postID isnot valid" });
+    }
 
     const post = await postModel.findOne({ _id: postID });
     if (!post) {
@@ -88,9 +101,9 @@ exports.dislike = async (req, res, next) => {
     const { postID } = req.body;
     const user = req.user;
 
-    // if (!isValidObjectId(postID)) {
-    //   return res.status(409).json({ message: "postID isnot valid" });
-    // }
+    if (!isValidObjectId(postID)) {
+      return res.status(409).json({ message: "postID isnot valid" });
+    }
 
     const like = await likeModel.findOne({ user: user._id, post: postID });
 

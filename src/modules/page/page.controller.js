@@ -19,7 +19,7 @@ exports.getPage = async (req, res, next) => {
 
     const page = await UserModel.findOne(
       { _id: pageID },
-      "name username private isVerified avatar"
+      "name username private isVerified avatar biogeraphy"
     ).lean();
 
     if (!hasAccessPage) {
@@ -54,7 +54,7 @@ exports.getPage = async (req, res, next) => {
       postLikesMap.set(postId, true); 
     });
 
-    console.log(postLikesMap)
+
 
     posts.forEach((post) => {
       const postId = post._id.toString();
@@ -65,13 +65,13 @@ exports.getPage = async (req, res, next) => {
 
     let followers = await FollowModel.find({ following: pageID })
       .lean()
-      .populate("follower", "name username");
+      .populate("follower", "name username avatar");
 
     followers = followers.map((item) => item.follower);
 
     let following = await FollowModel.find({ follower: pageID })
       .lean()
-      .populate("following", "name username");
+      .populate("following", "name username avatar");
 
     following = following.map((item) => item.following);
 

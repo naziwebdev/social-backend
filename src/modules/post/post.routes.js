@@ -24,4 +24,6 @@ router.route("/:postID/unsave").delete(auth, postController.unsavePost);
 
 router.route('/saves').get(auth,postController.getSaves )
 
+router.route('/:postID/remove').delete(auth,postController.remove)
+
 module.exports = router;

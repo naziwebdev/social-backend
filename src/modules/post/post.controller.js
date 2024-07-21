@@ -4,6 +4,8 @@ const { isValidObjectId } = require("mongoose");
 const hasAccessToPage = require("../../utils/hasAccessToPage");
 const likeModel = require("../../models/Like");
 const saveModel = require("../../models/Save");
+const fs = require("fs");
+const path = require("path");
 
 exports.create = async (req, res, next) => {
   try {
@@ -215,12 +217,12 @@ exports.unsavePost = async (req, res, next) => {
   }
 };
 
-
 exports.getSaves = async (req, res, next) => {
   try {
     const user = req.user;
 
-    const saves = await saveModel.find({ user: user._id })
+    const saves = await saveModel
+      .find({ user: user._id })
       .sort({ _id: -1 })
       .lean()
       .populate({
@@ -228,11 +230,12 @@ exports.getSaves = async (req, res, next) => {
         populate: {
           path: "user",
           model: "User",
-          select:"name username avatar"
+          select: "name username avatar",
         },
       });
 
-      const likes = await likeModel.find({user:user._id})
+    const likes = await likeModel
+      .find({ user: user._id })
       .lean()
       .populate("user", "_id")
       .populate("post", "_id");
@@ -246,9 +249,56 @@ exports.getSaves = async (req, res, next) => {
         });
       }
     });
-      
 
     return res.status(200).json(saves);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    const user = req.user;
+
+    const { postID } = req.params;
+
+    if (!isValidObjectId(postID)) {
+      return res.status(409).json({ message: "the postID in invalid" });
+    }
+
+    const post = await postModel.findOne({ _id: postID, user: user._id });
+
+    if (!post || post.user.toString() !== user._id.toString()) {
+      return res.status(404).json({ message: "not found post" });
+    }
+
+    await likeModel.deleteMany({ post: postID });
+    await saveModel.deleteMany({ post: postID });
+
+    const postFilePath = path.join(
+      __dirname,
+      "..",
+      "..",
+      "..",
+      "public",
+      "images",
+      "posts",
+      post.media.filename
+    );
+
+    fs.unlinkSync(postFilePath, (error) => {
+      if (error) {
+        next(error);
+      }
+    });
+
+    const removePost = await postModel.findOneAndDelete({ _id: postID });
+
+    if (!removePost) {
+      return res.status(404).json({ message: "post removed was faild" });
+    }
+
+    return res.status(200).json({ message: "post removed successfully" });
   } catch (error) {
     next(error);
   }

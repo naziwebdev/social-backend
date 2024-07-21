@@ -13,7 +13,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(postController.getAll)
+  .get(auth,postController.getAll)
   .post(auth, AccountVerify, upload.single("media"), postController.create);
 
 router.route("/like").post(auth, postController.like);

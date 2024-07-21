@@ -41,11 +41,44 @@ exports.create = async (req, res, next) => {
 
 exports.getAll = async (req, res, next) => {
   try {
+    const user = req.user;
     const posts = await postModel
       .find({})
       .populate("user", "name username avatar")
       .lean()
       .sort({ _id: -1 });
+
+    const likes = await likeModel
+      .find({ user: user._id })
+      .lean()
+      .populate("user", "_id")
+      .populate("post", "_id");
+
+    posts.forEach((post) => {
+      if (likes.length) {
+        likes.forEach((like) => {
+          if (post._id.toString() === like.post._id.toString()) {
+            post.hasLike = true;
+          }
+        });
+      }
+    });
+
+    const savePosts = await saveModel
+      .find({ user: user._id })
+      .lean()
+      .populate("user", "_id")
+      .populate("post", "_id");
+
+    posts.forEach((post) => {
+      if (savePosts.length) {
+        savePosts.forEach((save) => {
+          if (post._id.toString() === save.post._id.toString()) {
+            post.isSave = true;
+          }
+        });
+      }
+    });
 
     return res.status(200).json(posts);
   } catch (error) {
@@ -174,7 +207,7 @@ exports.unsavePost = async (req, res, next) => {
       return res.status(404).json({ message: "not found save post" });
     }
 
-    await saveModel.findOneAndDelete({ user: user._id, post: postID })
+    await saveModel.findOneAndDelete({ user: user._id, post: postID });
 
     return res.status(200).json({ message: "unsave done successfully" });
   } catch (error) {

@@ -3,6 +3,7 @@ const UserModel = require("../../models/User");
 const FollowModel = require("../../models/Follow");
 const postModel = require("../../models/Post");
 const likeModel = require("../../models/Like");
+const saveModel = require('../../models/Save')
 
 exports.getPage = async (req, res, next) => {
   try {
@@ -50,6 +51,23 @@ exports.getPage = async (req, res, next) => {
         likes.forEach((like) => {
           if (post._id.toString() === like.post._id.toString()) {
             post.hasLike = true;
+          }
+        });
+      }
+    });
+
+
+    const savePosts = await saveModel
+      .find({ user: user._id })
+      .lean()
+      .populate("user", "_id")
+      .populate("post", "_id");
+
+    posts.forEach((post) => {
+      if (savePosts.length) {
+        savePosts.forEach((save) => {
+          if (post._id.toString() === save.post._id.toString()) {
+            post.isSave = true;
           }
         });
       }

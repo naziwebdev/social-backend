@@ -86,6 +86,22 @@ exports.getAll = async (req, res, next) => {
       }
     });
 
+    const comments = await commentModel
+      .find({})
+      .lean()
+      .populate("user", "name username avatar");
+
+    posts.forEach((post) => {
+      if (comments.length) {
+        comments.forEach((comment) => {
+          if (post._id.toString() === comment.post.toString()) {
+            post.postComments = [];
+            post.postComments.push({ ...comment }, comment);
+          }
+        });
+      }
+    });
+
     return res.status(200).json(posts);
   } catch (error) {
     next(error);

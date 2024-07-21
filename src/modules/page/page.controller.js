@@ -4,6 +4,7 @@ const FollowModel = require("../../models/Follow");
 const postModel = require("../../models/Post");
 const likeModel = require("../../models/Like");
 const saveModel = require('../../models/Save')
+const commentModel = require('../../models/Comment')
 
 exports.getPage = async (req, res, next) => {
   try {
@@ -72,6 +73,21 @@ exports.getPage = async (req, res, next) => {
         });
       }
     });
+
+    const comments = await commentModel.find({}).lean().populate("user","name username avatar")
+
+
+
+    posts.forEach(post => {
+      if(comments.length){
+        comments.forEach(comment => {
+          if(post._id.toString() === comment.post.toString()){
+            post.postComments = []
+            post.postComments.push({...comment} ,comment)
+          }
+        })
+      }
+    })
 
 
     let followers = await FollowModel.find({ following: pageID })

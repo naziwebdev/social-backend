@@ -159,11 +159,25 @@ exports.savePost = async (req, res, next) => {
   }
 };
 
-
-exports.unsavePost = async (req,res,next) => {
+exports.unsavePost = async (req, res, next) => {
   try {
-    
+    const user = req.user;
+    const { postID } = req.params;
+
+    if (!isValidObjectId(postID)) {
+      return res.status(409).json({ message: "postID in invalid" });
+    }
+
+    const existSave = await saveModel.findOne({ user: user._id, post: postID });
+
+    if (!existSave) {
+      return res.status(404).json({ message: "not found save post" });
+    }
+
+    await saveModel.findOneAndDelete({ user: user._id, post: postID })
+
+    return res.status(200).json({ message: "unsave done successfully" });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};

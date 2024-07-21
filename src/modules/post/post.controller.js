@@ -351,6 +351,19 @@ exports.addComment = async (req, res, next) => {
 
 exports.removeComment = async (req, res, next) => {
   try {
+    const { commentID } = req.params
+
+    if (!isValidObjectId(commentID)) {
+        return res.status(400).json({ message: 'id is not valid' })
+    }
+
+    const removedCm = await commentModel.findOneAndDelete({ _id:commentID })
+
+    if (!removedCm) {
+        return res.status(404).json({ message: 'comment not found' })
+    }
+
+    return res.status(200).json({ message: 'comment removed successfully' })
   } catch (error) {
     next(error);
   }

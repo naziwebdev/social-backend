@@ -45,23 +45,16 @@ exports.getPage = async (req, res, next) => {
       .populate("user", "_id")
       .populate("post", "_id");
 
-    let postsWithLikes = [];
-
-    const postLikesMap = new Map();
-
-    likes.forEach((like) => {
-      const postId = like.post._id.toString();
-      postLikesMap.set(postId, true); 
-    });
-
-
-
     posts.forEach((post) => {
-      const postId = post._id.toString();
-      const hasLike = postLikesMap.get(postId) || false; 
-      postsWithLikes.push({ ...post, hasLike });
+      if (likes.length) {
+        likes.forEach((like) => {
+          if (post._id.toString() === like.post._id.toString()) {
+            post.hasLike = true;
+          }
+        });
+      }
     });
- 
+
 
     let followers = await FollowModel.find({ following: pageID })
       .lean()
@@ -85,7 +78,7 @@ exports.getPage = async (req, res, next) => {
       pageID,
       page,
       ownPage,
-      postsWithLikes,
+      posts,
     });
   } catch (error) {
     next(error);

@@ -12,7 +12,6 @@ const schema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
-    
     },
     biogeraphy: {
       type: String,
@@ -47,7 +46,7 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-schema.pre("save",  async function (next) {
+schema.pre("save", async function (next) {
   try {
     this.password = await bcrypt.hash(this.password, 10);
     next();
@@ -56,6 +55,25 @@ schema.pre("save",  async function (next) {
   }
 });
 
+
+
+schema.pre('findOneAndUpdate', async function (next) {
+  try {
+    // Access the query and update objects
+    const query = this.getQuery(); // The query object
+    const update = this.getUpdate(); // The update object
+
+
+    if (update.password) {
+      update.password = await bcrypt.hash(update.password, 10);
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+)
 const model = mongoose.model("User", schema);
 
 module.exports = model;

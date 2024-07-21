@@ -42,7 +42,8 @@ exports.create = async (req, res, next) => {
 exports.getAll = async (req,res,next) => {
   try {
 
-    const posts = await postModel.find({}).lean().sort({_id:-1})
+    const posts = await postModel.find({}).populate('user','name username avatar')
+    .lean().sort({_id:-1})
 
     return res.status(200).json(posts)
     

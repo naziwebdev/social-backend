@@ -3,23 +3,24 @@ const { editUserValidator } = require("./user.validators");
 
 exports.editUser = async (req, res, next) => {
   try {
-    const { name, username, email, password } = req.body;
+    const { name, username, email } = req.body;
     const user = req.user._id;
     await editUserValidator.validate(
-      { name, username, email, password },
+      { name, username, email },
       { abortEarly: false }
     );
 
-    const userUpdate = await userModel.findOneAndUpdate(
-      { _id: user },
-      {
-        name,
-        username,
-        email,
-        password,
-      },
-      { new: true }
-    ).select("-password")
+    const userUpdate = await userModel
+      .findOneAndUpdate(
+        { _id: user },
+        {
+          name,
+          username,
+          email,
+        },
+        { new: true }
+      )
+      .select("-password");
 
     if (!userUpdate) {
       return res.status(404).json({ message: "not found user" });
@@ -36,7 +37,7 @@ exports.editUser = async (req, res, next) => {
 exports.editAvatar = async (req, res, next) => {
   try {
     const file = req.file;
-    console.log(file)
+    console.log(file);
     const user = req.user._id;
     if (!file) {
       return res.status(404).json({ message: "not found file" });

@@ -3,6 +3,7 @@ const postModel = require("../../models/Post");
 const { isValidObjectId } = require("mongoose");
 const hasAccessToPage = require("../../utils/hasAccessToPage");
 const likeModel = require("../../models/Like");
+const saveModel = require("../../models/Save");
 
 exports.create = async (req, res, next) => {
   try {
@@ -38,26 +39,26 @@ exports.create = async (req, res, next) => {
   }
 };
 
-
-exports.getAll = async (req,res,next) => {
+exports.getAll = async (req, res, next) => {
   try {
+    const posts = await postModel
+      .find({})
+      .populate("user", "name username avatar")
+      .lean()
+      .sort({ _id: -1 });
 
-    const posts = await postModel.find({}).populate('user','name username avatar')
-    .lean().sort({_id:-1})
-
-    return res.status(200).json(posts)
-    
+    return res.status(200).json(posts);
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 exports.like = async (req, res, next) => {
   try {
     const { postID } = req.body;
     const user = req.user;
 
-    console.log(postID)
+    console.log(postID);
 
     if (!isValidObjectId(postID)) {
       return res.status(409).json({ message: "postID isnot valid" });
@@ -114,8 +115,55 @@ exports.dislike = async (req, res, next) => {
 
     await likeModel.findOneAndDelete({ _id: like._id });
 
-    return res.status(200).json({ message: "deleted dislike was successfully" });
+    return res
+      .status(200)
+      .json({ message: "deleted dislike was successfully" });
   } catch (error) {
     next(error);
   }
 };
+
+exports.savePost = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const { postID } = req.body;
+
+    const post = await postModel.findOne({ _id: postID }).lean();
+
+    if (!post) {
+      return res.status(404).json({ message: "not found post" });
+    }
+
+    const hasAccess = await hasAccessToPage(user._id, post.user.toString());
+
+    if (!hasAccess) {
+      return res.status(403).json({ message: "access is forbidden" });
+    }
+
+    const existSave = await saveModel.findOne({ user: user._id, post: postID });
+
+    if (existSave) {
+      return res.status(409).json({ message: "post saves already" });
+    }
+
+    const savePost = new saveModel({
+      user: user._id,
+      post: postID,
+    });
+
+    savePost.save();
+
+    return res.status(201).json({ message: "post save successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+exports.unsavePost = async (req,res,next) => {
+  try {
+    
+  } catch (error) {
+    next(error)
+  }
+}

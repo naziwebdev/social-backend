@@ -14,10 +14,12 @@ const router = express.Router();
 router
   .route("/")
   .get(postController.getAll)
-  .post(auth, AccountVerify, upload.single("media"), postController.create)
-
+  .post(auth, AccountVerify, upload.single("media"), postController.create);
 
 router.route("/like").post(auth, postController.like);
 router.route("/dislike").post(auth, postController.dislike);
+
+router.route("/save").post(auth, postController.savePost);
+router.route("/:postID/unsave").delete(auth, postController.unsavePost);
 
 module.exports = router;

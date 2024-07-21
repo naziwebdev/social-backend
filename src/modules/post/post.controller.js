@@ -1,9 +1,13 @@
-const { createPostValidator } = require("./post.validators");
+const {
+  createPostValidator,
+  createCommentValidator,
+} = require("./post.validators");
 const postModel = require("../../models/Post");
 const { isValidObjectId } = require("mongoose");
 const hasAccessToPage = require("../../utils/hasAccessToPage");
 const likeModel = require("../../models/Like");
 const saveModel = require("../../models/Save");
+const commentModel = require("../../models/Comment");
 const fs = require("fs");
 const path = require("path");
 
@@ -299,6 +303,38 @@ exports.remove = async (req, res, next) => {
     }
 
     return res.status(200).json({ message: "post removed successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.addComment = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const { content, postID } = req.body;
+
+    await createCommentValidator.validate({ content, postID });
+
+    const existPost = await postModel.findOne({ _id: postID }).lean();
+    if (!existPost) {
+      return res.status(404).json({ message: "not found post" });
+    }
+
+    await commentModel.create({
+      user: user._id,
+      post: postID,
+      content,
+      isAnswer: 0,
+    });
+
+    return res.status(201).json({ message: "comment add successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.removeComment = async (req, res, next) => {
+  try {
   } catch (error) {
     next(error);
   }

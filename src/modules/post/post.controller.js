@@ -214,3 +214,42 @@ exports.unsavePost = async (req, res, next) => {
     next(error);
   }
 };
+
+
+exports.getSaves = async (req, res, next) => {
+  try {
+    const user = req.user;
+
+    const saves = await saveModel.find({ user: user._id })
+      .sort({ _id: -1 })
+      .lean()
+      .populate({
+        path: "post",
+        populate: {
+          path: "user",
+          model: "User",
+          select:"name username avatar"
+        },
+      });
+
+      const likes = await likeModel.find({user:user._id})
+      .lean()
+      .populate("user", "_id")
+      .populate("post", "_id");
+
+    saves.forEach((save) => {
+      if (likes.length) {
+        likes.forEach((like) => {
+          if (save.post._id.toString() === like.post._id.toString()) {
+            save.post.hasLike = true;
+          }
+        });
+      }
+    });
+      
+
+    return res.status(200).json(saves);
+  } catch (error) {
+    next(error);
+  }
+};

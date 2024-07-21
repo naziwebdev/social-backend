@@ -22,4 +22,6 @@ router.route("/dislike").post(auth, postController.dislike);
 router.route("/save").post(auth, postController.savePost);
 router.route("/:postID/unsave").delete(auth, postController.unsavePost);
 
+router.route('/saves').get(auth,postController.getSaves )
+
 module.exports = router;

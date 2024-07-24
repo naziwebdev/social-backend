@@ -40,3 +40,12 @@ exports.loginSchemaٰValidator = yup.object({
     ),
 });
 
+
+exports.forgetPasswordValidator = yup.object({
+  email:yup
+    .string()
+    .email("email format in incorrect")
+    .required("email is required"),
+});
+
+

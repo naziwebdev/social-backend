@@ -1,10 +1,14 @@
 const userModel = require("../../models/User");
+const resetPasswordModel = require("../../models/ResetPassword");
 const {
   registerSchemaٰValidator,
   loginSchemaٰValidator,
+  forgetPasswordValidator,
 } = require("./auth.validator");
 const jwt = require("jsonwebtoken");
 const bcrybt = require("bcryptjs");
+const nodeMailer = require("nodemailer");
+const { v4: uuidv4 } = require("uuid");
 const RefreshTokenModel = require("../../models/RefreshToken");
 require("dotenv").config();
 
@@ -139,7 +143,7 @@ exports.refreshToken = async (req, res, next) => {
       return res.status(404).json({ message: "user not found" });
     }
 
-    const accessToken = jwt.sign({ userID:user._id }, process.env.JWT_SECRET, {
+    const accessToken = jwt.sign({ userID: user._id }, process.env.JWT_SECRET, {
       expiresIn: "30day",
     });
 
@@ -152,6 +156,66 @@ exports.refreshToken = async (req, res, next) => {
     return res
       .status(200)
       .json({ message: "access token generate successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.forgetPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    await forgetPasswordValidator.validate({ email });
+
+    const token = uuidv4();
+
+    const expireTimeToken = Date.now() + 60 * 60 * 1000;
+
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "not found user" });
+    }
+
+    await resetPasswordModel.create({
+      user: user._id,
+      token,
+      expireTime: expireTimeToken,
+    });
+
+    const transporter = nodeMailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "panirsstegar@gmail.com",
+        pass: "kocm cjhc risz cwpx",
+      },
+    });
+
+    const mailOptions = {
+      from: "panirsstegar@gmail.com",
+      to: email,
+      subject: "Reset Password Link For Your Social account",
+      html: `
+       <h2>Hi, ${user.name}</h2>
+       <a href=http://localhost:3000/reset-password/${token}>Reset Password</a>
+      `,
+    };
+
+    transporter.sendMail(mailOptions);
+
+    return res
+      .status(200)
+      .json({ message: "reset-password link send to your email" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.resetPassword = async (req, res, next) => {
+  try {
+
+    const {password} = req.body
+    
   } catch (error) {
     next(error);
   }

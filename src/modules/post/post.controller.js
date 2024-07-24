@@ -70,6 +70,14 @@ exports.getAll = async (req, res, next) => {
       }
     });
 
+    posts.forEach((post) => {
+      if (post.user._id.toString() === user._id.toString()) {
+        post.isOwn = true;
+      } else {
+        post.isOwn = false;
+      }
+    });
+
     const savePosts = await saveModel
       .find({ user: user._id })
       .lean()
@@ -96,7 +104,7 @@ exports.getAll = async (req, res, next) => {
       if (comments.length) {
         comments.forEach((comment) => {
           if (post._id.toString() === comment.post.toString()) {
-            post.postComments.push( comment);
+            post.postComments.push(comment);
           }
         });
       }
@@ -265,6 +273,24 @@ exports.getSaves = async (req, res, next) => {
         likes.forEach((like) => {
           if (save.post._id.toString() === like.post._id.toString()) {
             save.post.hasLike = true;
+          } else {
+            save.post.hasLike = false;
+          }
+        });
+      }
+    });
+
+    const comments = await commentModel
+      .find({})
+      .lean()
+      .populate("user", "name username avatar");
+
+    saves.forEach((save) => {
+      save.post.postComments = [];
+      if (comments.length) {
+        comments.forEach((comment) => {
+          if (save.post._id.toString() === comment.post.toString()) {
+            post.postComments.push(comment);
           }
         });
       }

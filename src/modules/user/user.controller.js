@@ -1,5 +1,8 @@
 const userModel = require("../../models/User");
-const { editUserValidator } = require("./user.validators");
+const {
+  editUserValidator,
+  editPasswordValidator,
+} = require("./user.validators");
 
 exports.editUser = async (req, res, next) => {
   try {
@@ -59,6 +62,28 @@ exports.editAvatar = async (req, res, next) => {
     }
 
     return res.status(200).json({ massage: "avatar uploaded successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.editPassword = async (req, res , next) => {
+  try {
+    const user = req.user;
+    const { password , confirmPassword } = req.body;
+
+    await editPasswordValidator.validate({ password , confirmPassword });
+
+    const updatePassword = await userModel.findOneAndUpdate(
+      { _id: user._id },
+      { password }
+    );
+
+    if (!updatePassword) {
+      return res.status(422).json({ message: "password  update was faild" });
+    }
+
+    return res.status(200).json({ message: "password updated successfully" });
   } catch (error) {
     next(error);
   }

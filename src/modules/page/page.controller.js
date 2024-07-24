@@ -102,7 +102,7 @@ exports.getPage = async (req, res, next) => {
 
     following = following.map((item) => item.following);
 
-    const ownPage = user._id.toString() === pageID;
+    const isOwn = user._id.toString() === pageID;
 
     return res.status(200).json({
       haveFollowed: Boolean(followed),
@@ -111,7 +111,7 @@ exports.getPage = async (req, res, next) => {
       following,
       pageID,
       page,
-      ownPage,
+      isOwn,
       posts,
     });
   } catch (error) {

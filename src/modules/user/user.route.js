@@ -13,4 +13,6 @@ router
   .route("/edit-avatar")
   .put(auth, upload.single("avatar"), userController.editAvatar);
 
+router.route("/edit-password").put(auth, userController.editPassword);
+
 module.exports = router;

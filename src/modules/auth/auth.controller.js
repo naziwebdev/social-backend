@@ -44,13 +44,13 @@ exports.register = async (req, res, next) => {
     res.cookie("access-token", accessToken, {
       maxAge: 90000000,
       httpOnly: true,
-      sameSite: 'strict', 
+      sameSite: "strict",
     });
 
     res.cookie("refresh-token", refreshToken, {
       maxAge: 90000000,
       httpOnly: true,
-      sameSite: 'strict', 
+      sameSite: "strict",
     });
 
     return res.status(201).json({ message: "user registerd successfully" });
@@ -95,13 +95,13 @@ exports.login = async (req, res, next) => {
     res.cookie("access-token", accessToken, {
       maxAge: 9000000,
       httpOnly: true,
-      sameSite: 'strict', 
+      sameSite: "strict",
     });
 
     res.cookie("refresh-token", refreshToken, {
       maxAge: 9000000,
       httpOnly: true,
-      sameSite: 'strict', 
+      sameSite: "strict",
     });
 
     return res.status(200).json({ message: "user login successfully" });
@@ -110,18 +110,49 @@ exports.login = async (req, res, next) => {
   }
 };
 
-
-exports.getMe = async (req,res,next) => {
+exports.getMe = async (req, res, next) => {
   try {
-
-    const user = await userModel.findOne({_id:req.user._id},'-password')
-    if(!user){
-        return res.status(404).json({ message: 'not found user' })
+    const user = await userModel.findOne({ _id: req.user._id }, "-password");
+    if (!user) {
+      return res.status(404).json({ message: "not found user" });
     }
 
-    return res.status(200).json(user)
-    
+    return res.status(200).json(user);
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const refreshTokenoken = req.cookies["refresh-token"];
+
+    const userID = await RefreshTokenModel.verifyToken(refreshTokenoken);
+
+    if (!userID) {
+      return res.status(409).json({ message: "refresh-token is invalid" });
+    }
+
+    const user = await userModel.findOne({ _id: userID });
+
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+
+    const accessToken = jwt.sign({ userID:user._id }, process.env.JWT_SECRET, {
+      expiresIn: "30day",
+    });
+
+    res.cookie("access-token", accessToken, {
+      maxAge: 9000000,
+      httpOnly: true,
+      sameSite: "strict",
+    });
+
+    return res
+      .status(200)
+      .json({ message: "access token generate successfully" });
+  } catch (error) {
+    next(error);
+  }
+};

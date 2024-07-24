@@ -9,6 +9,6 @@ router.route("/login").post(authController.login);
 router.route("/me").get(auth, authController.getMe);
 router.route("/refresh").post(authController.refreshToken);
 router.route("/forget-password").post(authController.forgetPassword);
-router.route("/reset-password").post(authController.resetPassword);
+router.route("/reset-password").put(authController.resetPassword);
 
 module.exports = router;

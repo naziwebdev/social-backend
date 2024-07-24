@@ -3,15 +3,17 @@ exports.errorHandler = (error, req, res, next) => {
   let message = error.message || "Server Error";
   const data = error.data;
 
-  //* making errors array
-  const errorArr = [];
-  if (error.errors) {
-    error.errors.forEach((e) => {
-      errorArr.push({
-        message: e,
-      });
-    });
-  }
+  // //* making errors array
+  // const errorArr = [];
+  // if (error.errors) {
+  //   error?.errors.forEach((e) => {
+  //     errorArr.push({
+  //       message: e,
+  //     });
+  //   });
+  // } else {
+  //   message = error.message;
+  // }
 
   res.status(status).json({ message, data });
   console.log("<<= ERROR HANDLER =>>");

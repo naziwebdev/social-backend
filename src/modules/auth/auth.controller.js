@@ -4,6 +4,7 @@ const {
   registerSchemaٰValidator,
   loginSchemaٰValidator,
   forgetPasswordValidator,
+  resetPasswordValidator,
 } = require("./auth.validator");
 const jwt = require("jsonwebtoken");
 const bcrybt = require("bcryptjs");
@@ -213,9 +214,33 @@ exports.forgetPassword = async (req, res, next) => {
 
 exports.resetPassword = async (req, res, next) => {
   try {
+    const { token, password } = req.body;
 
-    const {password} = req.body
-    
+    await resetPasswordValidator.validate({ token, password });
+
+    const resetPasswordDoc = await resetPasswordModel.findOne({
+      token,
+      expireTime: { $gt: Date.now() },
+    });
+
+    if (!resetPasswordDoc) {
+      return res.status(403).json({ message: "this link is expired" });
+    }
+
+    const userUpdate = await userModel.findOneAndUpdate(
+      { _id: resetPasswordDoc.user },
+      {
+        password,
+      }
+    );
+
+    if (!userUpdate) {
+      return res.status(409).json({ message: "reset password faild" });
+    }
+
+    await resetPasswordModel.findOneAndDelete({ _id: resetPasswordDoc._id });
+
+    return res.status(200).json({ message: "password reset successfully" });
   } catch (error) {
     next(error);
   }

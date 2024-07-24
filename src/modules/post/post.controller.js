@@ -92,11 +92,11 @@ exports.getAll = async (req, res, next) => {
       .populate("user", "name username avatar");
 
     posts.forEach((post) => {
+      post.postComments = [];
       if (comments.length) {
         comments.forEach((comment) => {
           if (post._id.toString() === comment.post.toString()) {
-            post.postComments = [];
-            post.postComments.push({ ...comment }, comment);
+            post.postComments.push( comment);
           }
         });
       }
@@ -351,19 +351,19 @@ exports.addComment = async (req, res, next) => {
 
 exports.removeComment = async (req, res, next) => {
   try {
-    const { commentID } = req.params
+    const { commentID } = req.params;
 
     if (!isValidObjectId(commentID)) {
-        return res.status(400).json({ message: 'id is not valid' })
+      return res.status(400).json({ message: "id is not valid" });
     }
 
-    const removedCm = await commentModel.findOneAndDelete({ _id:commentID })
+    const removedCm = await commentModel.findOneAndDelete({ _id: commentID });
 
     if (!removedCm) {
-        return res.status(404).json({ message: 'comment not found' })
+      return res.status(404).json({ message: "comment not found" });
     }
 
-    return res.status(200).json({ message: 'comment removed successfully' })
+    return res.status(200).json({ message: "comment removed successfully" });
   } catch (error) {
     next(error);
   }

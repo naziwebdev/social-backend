@@ -3,7 +3,7 @@ const auth = require("../../middlewares/auth");
 const { multerStorage } = require("../../middlewares/uploaderConfigs");
 const userController = require("./user.controller");
 
-const upload = multerStorage("public/images/avarats");
+const upload = multerStorage("public/images/avatars");
 
 const router = express.Router();
 

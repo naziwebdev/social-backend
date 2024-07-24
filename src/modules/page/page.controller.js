@@ -79,11 +79,11 @@ exports.getPage = async (req, res, next) => {
 
 
     posts.forEach(post => {
+      post.postComments = []
       if(comments.length){
         comments.forEach(comment => {
           if(post._id.toString() === comment.post.toString()){
-            post.postComments = []
-            post.postComments.push({...comment} ,comment)
+            post.postComments.push(comment)
           }
         })
       }

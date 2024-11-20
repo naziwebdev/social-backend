@@ -320,6 +320,7 @@ exports.remove = async (req, res, next) => {
 
     await likeModel.deleteMany({ post: postID });
     await saveModel.deleteMany({ post: postID });
+    await commentModel.deleteMany({post:postID})
 
     const postFilePath = path.join(
       __dirname,
